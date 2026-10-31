@@ -58,6 +58,11 @@ pub(super) enum Action {
     GpuProfile,
 }
 
+fn with_alpha(c: u32, a: f32) -> u32 {
+    let base = ((c >> 24) & 0xff) as f32;
+    (c & 0x00ff_ffff) | (((base * a.clamp(0.0, 1.0)).round() as u32) << 24)
+}
+
 pub(super) fn button(
     ui: &mut Ui,
     targets: &mut Vec<([f32; 4], Action)>,
@@ -68,10 +73,10 @@ pub(super) fn button(
 ) {
     let [x, y, w, h] = rect;
     if accent {
-        ui.rounded(x - 1.0, y - 1.0, w + 2.0, h + 2.0, 7.0, color::with_alpha(color::ACCENT, 0.45));
+        ui.rounded(x - 1.0, y - 1.0, w + 2.0, h + 2.0, 7.0, with_alpha(color::ACCENT, 0.45));
         ui.rounded(x, y, w, h, 6.0, color::ACCENT);
     } else {
-        ui.rounded(x - 1.0, y - 1.0, w + 2.0, h + 2.0, 7.0, color::with_alpha(color::BORDER, 0.25));
+        ui.rounded(x - 1.0, y - 1.0, w + 2.0, h + 2.0, 7.0, with_alpha(color::BORDER, 0.25));
         ui.rounded(x, y, w, h, 6.0, color::RAISED);
     }
     let padding = (w * 0.12).clamp(4.0, 12.0);
