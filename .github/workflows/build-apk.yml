@@ -1,0 +1,61 @@
+name: Build Horizon Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - android
+
+jobs:
+  build:
+    name: Build ARM64 APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      HORIZON_TELEMETRY_URL: "off"
+      CARGO_BUILD_JOBS: "2"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android
+
+      - name: Setup Android NDK and Build Tools
+        run: |
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;28.2.13676358" "build-tools;35.0.0"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.14'
+
+      - name: Prepare Engine Data Tables
+        run: |
+          mkdir -p .local/android
+          curl -sL "https://github.com/Vasysik/horizon-android/releases/download/v0.7.6-rc1/Horizon-Android-0.7.6-arm64-v8a.apk" -o /tmp/base.apk
+          unzip -p /tmp/base.apk assets/engine-data.zip > .local/android/engine-data-generated.zip
+          unzip -p /tmp/base.apk assets/engine-data.zip > .local/android/engine-data.zip
+          mkdir -p .local/horizon-client/26.3
+          unzip -q -o .local/android/engine-data-generated.zip -d .local/horizon-client/26.3/
+
+      - name: Build Public Distribution APK
+        run: |
+          python3 tools/android_build.py --abi arm64-v8a --public --gradle "$(which gradle)"
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Horizon-Android-0.7.7-modern-arm64
+          path: .local/android/apk/arm64-v8a/horizon-android-public.apk
+          if-no-files-found: error
