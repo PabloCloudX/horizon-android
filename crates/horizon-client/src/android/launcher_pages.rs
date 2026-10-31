@@ -67,14 +67,13 @@ pub(super) fn button(
     accent: bool,
 ) {
     let [x, y, w, h] = rect;
-    ui.rounded(
-        x,
-        y,
-        w,
-        h,
-        2.0,
-        if accent { color::ACCENT } else { color::RAISED },
-    );
+    if accent {
+        ui.rounded(x - 1.0, y - 1.0, w + 2.0, h + 2.0, 7.0, color::with_alpha(color::ACCENT, 0.45));
+        ui.rounded(x, y, w, h, 6.0, color::ACCENT);
+    } else {
+        ui.rounded(x - 1.0, y - 1.0, w + 2.0, h + 2.0, 7.0, color::with_alpha(color::BORDER, 0.25));
+        ui.rounded(x, y, w, h, 6.0, color::RAISED);
+    }
     let padding = (w * 0.12).clamp(4.0, 12.0);
     let base = if w < 80.0 { 13.0 } else { 16.0 };
     let font = if matches!(action, Action::Page(_)) {
@@ -417,12 +416,13 @@ impl Launcher {
                     progress.stage.label(),
                 );
             } else {
+                let play_w = if compact { w - 64.0 } else { 320.0 };
                 button(
                     &mut ui,
                     &mut self.targets,
-                    [32.0, h - 100.0, 320.0, 60.0],
+                    [32.0, h - 96.0, play_w, 56.0],
                     if installed {
-                        "Play"
+                        "▶  Play Game"
                     } else if self.error.is_some() {
                         "Retry installation"
                     } else {
