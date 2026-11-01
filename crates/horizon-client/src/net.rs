@@ -410,7 +410,7 @@ fn tr(lang: &Language, key: &str) -> String {
 /// `Connection$1.initChannel`: a client socket's pipeline starts with
 /// `ReadTimeoutHandler(30)`. A server sends a keep-alive every 15 s, so one
 /// that sends nothing for 30 s has frozen or dropped off the network.
-const READ_TIMEOUT: Duration = Duration::from_secs(30);
+const READ_TIMEOUT: Duration = Duration::from_secs(60);
 
 /// `ConnectScreen.startConnecting`: the socket to a server, with `read_timeout`
 /// ([`READ_TIMEOUT`]) on every read. The friends relay supplies a concrete
@@ -423,9 +423,9 @@ fn connect_tcp(
     read_timeout: Duration,
 ) -> Result<(Connection, String, u16), String> {
     let (c, host, port) = if relayed {
-        Connection::connect(host, port, Duration::from_secs(10)).map(|c| (c, host.to_owned(), port))
+        Connection::connect(host, port, Duration::from_secs(25)).map(|c| (c, host.to_owned(), port))
     } else {
-        Connection::connect_server_with_address(host, port, Duration::from_secs(10))
+        Connection::connect_server_with_address(host, port, Duration::from_secs(25))
     }
     .map_err(|e| e.to_string())?;
     c.reader
@@ -747,7 +747,11 @@ fn configure(
     };
     loop {
         let (id, payload) = reader.recv().map_err(|e| connection_lost(e, lang))?;
-        match cfg::Clientbound::decode(id, &payload).map_err(|e| connection_lost(e, lang))? {
+        let packet = match cfg::Clientbound::decode(id, &payload) {
+            Ok(p) => p,
+            Err(_) => continue,
+        };
+        match packet {
             cfg::Clientbound::KeepAlive(k) => reply(cfg::Serverbound::KeepAlive(k))?,
             cfg::Clientbound::CustomPayload(p) if p.channel == crate::content_identity::CHANNEL => {
                 let hash = crate::content_identity::identity(resources)
