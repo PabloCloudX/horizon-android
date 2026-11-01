@@ -4,11 +4,11 @@ android {
     namespace 'dev.horizon.android'
     compileSdk 35
     defaultConfig {
-        applicationId providers.gradleProperty('appId').getOrElse('dev.horizon.android')
+        applicationId providers.gradleProperty('appId').getOrElse('dev.horizon.android.mod')
         minSdk providers.gradleProperty('minSdk').getOrElse('28').toInteger()
         targetSdk 35
-        versionCode 30
-        versionName '0.7.8-futuristic'
+        versionCode 31
+        versionName '0.7.8-futuristic-clone'
         ndk { abiFilters providers.gradleProperty('abi').get() }
     }
     signingConfigs {
