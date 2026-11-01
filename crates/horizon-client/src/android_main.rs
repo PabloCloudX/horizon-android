@@ -64,9 +64,9 @@ mod skins;
 // The shared account protocol needs only the launcher's version and data path.
 mod backend {
     pub const VERSION: &str = if crate::PUBLIC_BUILD {
-        "0.7.10-sildurs"
+        "0.7.11-bsl"
     } else {
-        "0.7.10-sildurs-dev"
+        "0.7.11-bsl-dev"
     };
     static HOME: std::sync::OnceLock<std::path::PathBuf> = std::sync::OnceLock::new();
     pub fn initialize(home: std::path::PathBuf) {
@@ -152,16 +152,25 @@ pub(crate) fn android_event_loop() -> Result<EventLoop<()>, winit::error::EventL
 }
 
 /// Development overrides for testing both of Horizon's single-player paths.
+fn bssl_pack_exists(p: &std::path::Path) -> bool { p.is_file() }
+
 pub(crate) fn android_arguments() -> horizon_client::Result<Vec<String>> {
     let home = APP.with(|app| app.borrow().as_ref().unwrap().internal_data_path().unwrap());
-    // Ensure native Sildur's Enhanced Default shader pack is bundled in shaderpacks/
+    // Ensure native shader packs (Sildur's Enhanced & BSL Shaders) are bundled in shaderpacks/
     let shader_dir = home.join("shaderpacks");
+    let _ = std::fs::create_dir_all(&shader_dir);
     let sildur_pack = shader_dir.join("sildurs_enhanced.hshader");
     if !sildur_pack.is_file() {
-        let _ = std::fs::create_dir_all(&shader_dir);
         let _ = std::fs::write(
             &sildur_pack,
             include_bytes!("../../horizon-shader-api/packs/sildurs_enhanced.hshader"),
+        );
+    }
+    let bsl_pack = shader_dir.join("bsl_shaders.hshader");
+    if !bssl_pack_exists(&bsl_pack) {
+        let _ = std::fs::write(
+            &bsl_pack,
+            include_bytes!("../../horizon-shader-api/packs/bsl_shaders.hshader"),
         );
     }
     let config = catalog::Config::load(&home);
