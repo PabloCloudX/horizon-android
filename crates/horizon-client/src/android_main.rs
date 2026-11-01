@@ -64,9 +64,9 @@ mod skins;
 // The shared account protocol needs only the launcher's version and data path.
 mod backend {
     pub const VERSION: &str = if crate::PUBLIC_BUILD {
-        "0.7.8-futuristic"
+        "0.7.9-zalith"
     } else {
-        "0.7.8-futuristic-dev"
+        "0.7.9-zalith-dev"
     };
     static HOME: std::sync::OnceLock<std::path::PathBuf> = std::sync::OnceLock::new();
     pub fn initialize(home: std::path::PathBuf) {
