@@ -37,7 +37,7 @@ impl FrameGraph {
             let width = text_w + 14.0;
             let height = 18.0;
             let x = batch.width - width - 6.0;
-            let y = 6.0;
+            let y = 46.0; // Placed below top back/pause buttons to avoid overlap
             // Dark futuristic glass pill
             batch.fill(atlas, x, y, width, height, rgba(10, 15, 26, 180));
             // Neon cyan top border highlight
