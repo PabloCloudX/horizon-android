@@ -63,3 +63,10 @@ jobs:
           name: Horizon-Android-0.7.7-modern-arm64
           path: .local/android/apk/arm64-v8a/horizon-android-public.apk
           if-no-files-found: error
+
+      - name: Upload Shader Pack Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Sildurs-Enhanced-Default-hshader
+          path: crates/horizon-shader-api/packs/sildurs_enhanced.hshader
+          if-no-files-found: error
