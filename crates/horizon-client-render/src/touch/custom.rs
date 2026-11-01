@@ -123,8 +123,10 @@ impl TouchControls {
                 if !self.custom_fingers.values().any(|k| *k == key) {
                     self.custom_events.push((key, false));
                 }
+                return true;
             }
-            return true;
+            // Allow drag-to-aim while custom button is held (Zalith/Pojav ergonomics)
+            return false;
         }
         if started && let Some(index) = self.custom_at(point) {
             let key = self.settings.custom_buttons[index].key.clone();
