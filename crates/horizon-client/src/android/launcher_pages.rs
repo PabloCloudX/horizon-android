@@ -234,28 +234,36 @@ impl Launcher {
         // Futuristic top cyan neon laser beam
         ui.batch
             .fill(&gui.atlas, 0.0, 0.0, w * scale, 2.5 * scale, 0xFF00E5FF);
+        // Zalith Launcher Modern Top Header
+        let brand_x = if w < 700.0 { 16.0 } else { 32.0 };
+        let brand_y = if w < 700.0 { 10.0 } else { 16.0 };
+        let brand_w = if w < 700.0 { 210.0 } else { 260.0 };
+        ui.rounded(brand_x, brand_y, brand_w, 38.0, 8.0, 0xD0101827);
+        ui.border(brand_x, brand_y, brand_w, 38.0, 8.0, 0x4000E5FF);
         ui.text(
             Face::Medium,
-            if w < 400.0 {
-                20.0
-            } else if w < 700.0 {
-                24.0
-            } else {
-                30.0
-            },
-            32.0,
-            if w < 700.0 { 12.0 } else { 26.0 },
+            if w < 700.0 { 15.0 } else { 17.0 },
+            brand_x + 12.0,
+            brand_y + 10.0,
             0xFF00E5FF,
-            &format!("HORIZON // 26.3 VULKAN"),
+            "⚡ ZALITH CLIENT",
+        );
+        ui.text(
+            Face::Regular,
+            11.0,
+            brand_x + (if w < 700.0 { 146.0 } else { 190.0 }),
+            brand_y + 13.0,
+            0xFF64748B,
+            "v0.7.9",
         );
         button(
             &mut ui,
             &mut self.targets,
             [
-                if w < 700.0 { 32.0 } else { w - 320.0 },
-                if w < 700.0 { 47.0 } else { 24.0 },
-                if w < 700.0 { w - 64.0 } else { 288.0 },
-                if w < 700.0 { 34.0 } else { 46.0 },
+                if w < 700.0 { 16.0 } else { w - 300.0 },
+                if w < 700.0 { 54.0 } else { 16.0 },
+                if w < 700.0 { w - 32.0 } else { 268.0 },
+                38.0,
             ],
             &self.login.status(&self.catalog.config.name),
             Action::Account,
@@ -264,12 +272,14 @@ impl Launcher {
         let tabs = Page::ALL.len() as f32;
         let tab_margin = if w < 700.0 { 16.0 } else { 32.0 };
         let tab_width = (w - 2.0 * tab_margin) / tabs;
+        let tab_y = if w < 700.0 { 98.0 } else { 66.0 };
+        let tab_h = 38.0;
         for (i, page) in Page::ALL.iter().enumerate() {
             let x = tab_margin + i as f32 * tab_width;
             button(
                 &mut ui,
                 &mut self.targets,
-                [x, 88.0, tab_width - 4.0, 42.0],
+                [x, tab_y, tab_width - 4.0, tab_h],
                 if w < 700.0 {
                     match page {
                         Page::Installed => "Files",
@@ -290,33 +300,9 @@ impl Launcher {
             let installed = horizon_client::official_install::ready(&self.home);
             let installing = self.worker.is_some();
             let progress = *self.install.lock().unwrap();
-            let top = 160.0;
-            ui.text(
-                Face::Medium,
-                32.0,
-                32.0,
-                top,
-                color::TEXT,
-                if installing {
-                    "Getting your game ready"
-                } else if installed {
-                    "Ready to play"
-                } else {
-                    if compact {
-                        "Your Java worlds"
-                    } else {
-                        "Your Java worlds, on Android"
-                    }
-                },
-            );
-            ui.text(
-                Face::Regular,
-                17.0,
-                32.0,
-                top + 47.0,
-                color::MUTED,
-                &format!("Minecraft 26.3  /  Profile {}", self.catalog.config.profile),
-            );
+            let content_top = if w < 700.0 { 146.0 } else { 116.0 };
+            let play_y = h - 68.0;
+            let available_h = (play_y - content_top - 12.0).max(110.0);
             if installing {
                 let current = InstallStage::ALL
                     .iter()
@@ -325,7 +311,7 @@ impl Launcher {
                 let row_height = ((h - 360.0) / 6.0).clamp(25.0, 40.0);
                 if h >= 620.0 {
                     for (index, stage) in InstallStage::ALL.iter().enumerate() {
-                        let y = top + 90.0 + index as f32 * row_height;
+                        let y = content_top + 40.0 + index as f32 * row_height;
                         let label = if index < current {
                             format!("{:02}  {}  - done", index + 1, stage.label())
                         } else {
@@ -349,7 +335,7 @@ impl Launcher {
                         Face::Regular,
                         18.0,
                         32.0,
-                        top + 100.0,
+                        content_top + 40.0,
                         color::TEXT,
                         progress.stage.label(),
                     );
@@ -357,7 +343,7 @@ impl Launcher {
                         Face::Regular,
                         15.0,
                         32.0,
-                        top + 138.0,
+                        content_top + 72.0,
                         color::MUTED,
                         &format!("Step {} of 6", current + 1),
                     );
@@ -368,7 +354,7 @@ impl Launcher {
                     0.0
                 };
                 let overall = (current as f32 + fraction.clamp(0.0, 1.0)) / 6.0;
-                let bar_y = h - 152.0;
+                let bar_y = h - 142.0;
                 ui.rounded(32.0, bar_y, w - 64.0, 4.0, 2.0, color::RAISED);
                 if overall > 0.0 {
                     ui.rounded(32.0, bar_y, (w - 64.0) * overall, 4.0, 2.0, color::ACCENT);
@@ -383,7 +369,7 @@ impl Launcher {
                         "{} / {} control files verified",
                         progress.done, progress.total
                     ),
-                    _ => "Please keep Horizon open. Downloaded files are kept for retry.".into(),
+                    _ => "Please keep Zalith open. Downloaded files are kept for retry.".into(),
                 };
                 ui.text(
                     Face::Regular,
@@ -393,29 +379,202 @@ impl Launcher {
                     color::MUTED,
                     &detail,
                 );
-            } else {
-                let rows = if installed {
-                    [
-                        "01  Open a world or join a Java server",
-                        "02  Touch setup: Options > Controls",
-                        "03  Find packs and .hmod in the tabs",
-                    ]
-                } else {
-                    [
-                        "01  Download resources from Mojang",
-                        "02  Install and verify on this phone",
-                        "03  Play offline or sign in for servers",
-                    ]
-                };
-                for (index, line) in rows.iter().enumerate() {
+            } else if installed {
+                if !compact {
+                    // Modern Zalith 2-Column Split Dashboard (Landscape)
+                    let card_x = 32.0;
+                    let card_w = (w * 0.56 - 32.0).max(280.0);
+                    let card_h = available_h;
+                    // Hero Game Card
+                    ui.rounded(card_x, content_top, card_w, card_h, 12.0, 0xF00D131F);
+                    ui.border(card_x, content_top, card_w, card_h, 12.0, 0x5000E5FF);
+                    // Status Badge
+                    ui.rounded(card_x + 16.0, content_top + 16.0, 126.0, 24.0, 6.0, 0x3022C55E);
+                    ui.text(
+                        Face::Medium,
+                        11.0,
+                        card_x + 24.0,
+                        content_top + 21.0,
+                        0xFF22C55E,
+                        "● ENGINE ONLINE",
+                    );
+                    // Title
+                    ui.text(
+                        Face::Medium,
+                        22.0,
+                        card_x + 16.0,
+                        content_top + 48.0,
+                        0xFFF8FAFC,
+                        "MINECRAFT JAVA 26.3",
+                    );
+                    // Subtitle / Profile
                     ui.text(
                         Face::Regular,
-                        17.0,
-                        32.0,
-                        top + 100.0 + index as f32 * 42.0,
-                        color::MUTED,
-                        line,
+                        13.0,
+                        card_x + 16.0,
+                        content_top + 76.0,
+                        0xFF38BDF8,
+                        &format!("Profile: {} • Vulkan Pipeline", self.catalog.config.profile),
                     );
+                    // Ergonomics Highlight Pill
+                    ui.rounded(card_x + 16.0, content_top + 102.0, card_w - 32.0, 28.0, 6.0, 0x2038BDF8);
+                    ui.text(
+                        Face::Medium,
+                        11.0,
+                        card_x + 24.0,
+                        content_top + 108.0,
+                        0xFF00E5FF,
+                        "⚡ Zalith Pro Touch 2.0: Drag-to-Aim Active",
+                    );
+                    if card_h >= 170.0 {
+                        ui.text(
+                            Face::Regular,
+                            12.0,
+                            card_x + 16.0,
+                            content_top + 140.0,
+                            0xFF94A3B8,
+                            "DNS Fallback: Cloudflare 1.1.1.1 + Google 8.8.8.8",
+                        );
+                    }
+
+                    // Right Feature Cards
+                    let feat_x = card_x + card_w + 16.0;
+                    let feat_w = w - feat_x - 32.0;
+                    let feat_h = ((available_h - 12.0) / 2.0).max(60.0);
+                    // Feature Card 1
+                    ui.rounded(feat_x, content_top, feat_w, feat_h, 10.0, 0xD0111A2E);
+                    ui.border(feat_x, content_top, feat_w, feat_h, 10.0, 0x3038BDF8);
+                    ui.text(
+                        Face::Medium,
+                        13.0,
+                        feat_x + 14.0,
+                        content_top + 12.0,
+                        0xFF00E5FF,
+                        "⚡ 2-FINGER DRAG CONTROLS",
+                    );
+                    ui.text(
+                        Face::Regular,
+                        11.0,
+                        feat_x + 14.0,
+                        content_top + 32.0,
+                        0xFFCBD5E1,
+                        "Hold attack/mine & drag thumb to rotate view.",
+                    );
+                    if feat_h >= 68.0 {
+                        ui.text(
+                            Face::Regular,
+                            10.0,
+                            feat_x + 14.0,
+                            content_top + 48.0,
+                            0xFF64748B,
+                            "Pojav / Zalith touch parity (no 3rd finger).",
+                        );
+                    }
+
+                    // Feature Card 2
+                    let feat2_y = content_top + feat_h + 12.0;
+                    ui.rounded(feat_x, feat2_y, feat_w, feat_h, 10.0, 0xD0111A2E);
+                    ui.border(feat_x, feat2_y, feat_w, feat_h, 10.0, 0x3038BDF8);
+                    ui.text(
+                        Face::Medium,
+                        13.0,
+                        feat_x + 14.0,
+                        feat2_y + 12.0,
+                        0xFF38BDF8,
+                        "🌐 ANTI-DISCONNECT DNS",
+                    );
+                    ui.text(
+                        Face::Regular,
+                        11.0,
+                        feat_x + 14.0,
+                        feat2_y + 32.0,
+                        0xFFCBD5E1,
+                        "Automated public DNS resolution for servers.",
+                    );
+                    if feat_h >= 68.0 {
+                        ui.text(
+                            Face::Regular,
+                            10.0,
+                            feat_x + 14.0,
+                            feat2_y + 48.0,
+                            0xFF64748B,
+                            "Extended 25s connect & 60s read keepalive.",
+                        );
+                    }
+                } else {
+                    // Modern Zalith Stacked Dashboard (Portrait)
+                    let card_x = 20.0;
+                    let card_w = w - 40.0;
+                    let hero_h = 136.0;
+                    ui.rounded(card_x, content_top, card_w, hero_h, 12.0, 0xF00D131F);
+                    ui.border(card_x, content_top, card_w, hero_h, 12.0, 0x5000E5FF);
+                    ui.rounded(card_x + 14.0, content_top + 14.0, 116.0, 22.0, 6.0, 0x3022C55E);
+                    ui.text(
+                        Face::Medium,
+                        10.0,
+                        card_x + 20.0,
+                        content_top + 18.0,
+                        0xFF22C55E,
+                        "● ENGINE ONLINE",
+                    );
+                    ui.text(
+                        Face::Medium,
+                        19.0,
+                        card_x + 14.0,
+                        content_top + 42.0,
+                        0xFFF8FAFC,
+                        "MINECRAFT JAVA 26.3",
+                    );
+                    ui.text(
+                        Face::Regular,
+                        12.0,
+                        card_x + 14.0,
+                        content_top + 68.0,
+                        0xFF38BDF8,
+                        &format!("Profile: {} • Vulkan Accelerated", self.catalog.config.profile),
+                    );
+                    ui.rounded(card_x + 14.0, content_top + 94.0, card_w - 28.0, 26.0, 6.0, 0x2038BDF8);
+                    ui.text(
+                        Face::Medium,
+                        11.0,
+                        card_x + 20.0,
+                        content_top + 99.0,
+                        0xFF00E5FF,
+                        "⚡ Zalith Pro Touch 2.0 (Drag-to-Aim)",
+                    );
+
+                    let feat_y = content_top + hero_h + 10.0;
+                    if available_h >= 240.0 {
+                        let card2_h = ((available_h - hero_h - 20.0) / 2.0).clamp(44.0, 70.0);
+                        ui.rounded(card_x, feat_y, card_w, card2_h, 10.0, 0xD0111A2E);
+                        ui.border(card_x, feat_y, card_w, card2_h, 10.0, 0x3038BDF8);
+                        ui.text(Face::Medium, 12.0, card_x + 14.0, feat_y + 10.0, 0xFF00E5FF, "⚡ 2-FINGER CONTROLS");
+                        ui.text(Face::Regular, 11.0, card_x + 14.0, feat_y + 26.0, 0xFFCBD5E1, "Hold attack/mine & drag to rotate camera.");
+
+                        let feat2_y = feat_y + card2_h + 10.0;
+                        if feat2_y + card2_h <= play_y - 10.0 {
+                            ui.rounded(card_x, feat2_y, card_w, card2_h, 10.0, 0xD0111A2E);
+                            ui.border(card_x, feat2_y, card_w, card2_h, 10.0, 0x3038BDF8);
+                            ui.text(Face::Medium, 12.0, card_x + 14.0, feat2_y + 10.0, 0xFF38BDF8, "🌐 ANTI-DISCONNECT DNS");
+                            ui.text(Face::Regular, 11.0, card_x + 14.0, feat2_y + 26.0, 0xFFCBD5E1, "Google & Cloudflare DNS fallback active.");
+                        }
+                    }
+                }
+            } else {
+                // Not installed yet
+                let card_x = if compact { 20.0 } else { 32.0 };
+                let card_w = if compact { w - 40.0 } else { w - 64.0 };
+                ui.rounded(card_x, content_top, card_w, available_h.min(220.0), 12.0, 0xF00D131F);
+                ui.border(card_x, content_top, card_w, available_h.min(220.0), 12.0, 0x5000E5FF);
+                ui.text(Face::Medium, 20.0, card_x + 20.0, content_top + 24.0, 0xFFF8FAFC, "Welcome to Zalith Launcher");
+                ui.text(Face::Regular, 14.0, card_x + 20.0, content_top + 56.0, 0xFF94A3B8, "Download game files to start playing Minecraft Java on Android.");
+                let steps = [
+                    "01  Verified Mojang resource download",
+                    "02  Touch setup with Pro Touch 2.0 drag-to-aim",
+                    "03  Multiplayer with DNS fallbacks & low-latency Vulkan",
+                ];
+                for (i, step) in steps.iter().enumerate() {
+                    ui.text(Face::Regular, 13.0, card_x + 20.0, content_top + 94.0 + i as f32 * 32.0, 0xFF38BDF8, step);
                 }
             }
             if installing {
@@ -428,16 +587,17 @@ impl Launcher {
                     progress.stage.label(),
                 );
             } else {
-                let play_w = if compact { w - 64.0 } else { 320.0 };
-                let play_y = h - 96.0;
-                // Futuristic glowing launch button
-                ui.rounded(30.0, play_y - 2.0, play_w + 4.0, 60.0, 14.0, 0x6000E5FF);
+                let play_w = if compact { w - 40.0 } else { w - 64.0 };
+                let play_x = if compact { 20.0 } else { 32.0 };
+                let play_y = h - 64.0;
+                // High-tech Zalith neon glow launch button
+                ui.rounded(play_x - 2.0, play_y - 2.0, play_w + 4.0, 56.0, 14.0, 0x6000E5FF);
                 button(
                     &mut ui,
                     &mut self.targets,
-                    [32.0, play_y, play_w, 56.0],
+                    [play_x, play_y, play_w, 52.0],
                     if installed {
-                        "⚡  LAUNCH HORIZON"
+                        "⚡  LAUNCH MINECRAFT (ZALITH)"
                     } else if self.error.is_some() {
                         "🔄  Retry Installation"
                     } else {
