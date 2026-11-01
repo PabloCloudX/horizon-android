@@ -1,0 +1,68 @@
+schema = 1
+id = "sildurs_enhanced"
+name = "Sildur's Enhanced Default"
+version = "1.0.0"
+api = "0.1"
+description = "Sildur's Enhanced Default for Horizon: warm cinematic sun, vibrant sky, soft torchlight, and tropical waters."
+authors = ["Sildur", "Horizon"]
+license = "MIT"
+shared = ["common.wgsl"]
+
+[sky]
+file = "sky.wgsl"
+name = "Atmosphere"
+
+[material]
+file = "material.wgsl"
+name = "Enhanced Materials"
+
+[[post]]
+file = "post/grade.wgsl"
+name = "Cinematic Grade"
+
+[[options]]
+id = "sun_warmth"
+name = "Sun Warmth"
+description = "Warmth of the sun and horizon at sunset and sunrise."
+type = "float"
+default = 0.6
+min = 0.0
+max = 1.0
+step = 0.05
+
+[[options]]
+id = "saturation"
+name = "Saturation"
+description = "Color vibrance and saturation."
+type = "float"
+default = 1.15
+min = 0.0
+max = 2.0
+step = 0.05
+
+[[options]]
+id = "contrast"
+name = "Contrast"
+description = "Terrain and lighting contrast."
+type = "float"
+default = 1.12
+min = 0.8
+max = 1.6
+step = 0.02
+
+[[options]]
+id = "vignette"
+name = "Vignette"
+description = "Soft camera vignette around screen edges."
+type = "bool"
+default = true
+
+[[options]]
+id = "water_tint"
+name = "Tropical Water"
+description = "Translucent tropical turquoise tint for water."
+type = "bool"
+default = true
+
+[budget]
+gpu_ms = 1.0
