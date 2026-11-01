@@ -1,0 +1,82 @@
+schema = 1
+id = "bsl_shaders"
+name = "BSL Shaders (Native)"
+version = "1.0.0"
+api = "0.1"
+description = "BSL Shaders 1:1 for Horizon: iconic warm filmic tonemap, dreamy bloom, atmospheric Rayleigh sky, and crystal waters."
+authors = ["Capt Tatsu", "Horizon"]
+license = "Custom"
+shared = ["common.wgsl"]
+
+[sky]
+file = "sky.wgsl"
+name = "BSL Atmosphere"
+
+[material]
+file = "material.wgsl"
+name = "BSL Materials & Lighting"
+
+[[post]]
+file = "post/bloom.wgsl"
+name = "BSL Bloom"
+
+[[post]]
+file = "post/grade.wgsl"
+name = "BSL Color Grade"
+
+[[options]]
+id = "bloom"
+name = "Bloom"
+description = "Soft romantic radiance around bright sources and sky."
+type = "float"
+default = 0.45
+min = 0.0
+max = 1.0
+step = 0.05
+
+[[options]]
+id = "sun_warmth"
+name = "Sun Warmth"
+description = "Golden hour and sunset atmosphere warmth."
+type = "float"
+default = 0.7
+min = 0.0
+max = 1.0
+step = 0.05
+
+[[options]]
+id = "saturation"
+name = "Saturation"
+description = "Color vibrance and saturation."
+type = "float"
+default = 1.15
+min = 0.0
+max = 2.0
+step = 0.05
+
+[[options]]
+id = "contrast"
+name = "Contrast"
+description = "BSL cinematic lighting contrast."
+type = "float"
+default = 1.15
+min = 0.8
+max = 1.6
+step = 0.02
+
+[[options]]
+id = "vignette"
+name = "Vignette"
+description = "Subtle filmic lens vignette."
+type = "bool"
+default = true
+
+[[options]]
+id = "water_translucency"
+name = "Crystal Water"
+description = "BSL crystal aquamarine water tint and depth."
+type = "bool"
+default = true
+
+[budget]
+gpu_ms = 1.2
