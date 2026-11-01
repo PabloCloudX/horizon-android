@@ -64,9 +64,16 @@ jobs:
           path: .local/android/apk/arm64-v8a/horizon-android-public.apk
           if-no-files-found: error
 
-      - name: Upload Shader Pack Artifact
+      - name: Upload Sildur Shader Pack Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Sildurs-Enhanced-Default-hshader
           path: crates/horizon-shader-api/packs/sildurs_enhanced.hshader
+          if-no-files-found: error
+
+      - name: Upload BSL Shader Pack Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BSL-Shaders-Native-hshader
+          path: crates/horizon-shader-api/packs/bsl_shaders.hshader
           if-no-files-found: error
