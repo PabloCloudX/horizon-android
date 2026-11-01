@@ -73,11 +73,14 @@ pub(super) fn button(
 ) {
     let [x, y, w, h] = rect;
     if accent {
-        ui.rounded(x - 1.0, y - 1.0, w + 2.0, h + 2.0, 7.0, with_alpha(color::ACCENT, 0.45));
-        ui.rounded(x, y, w, h, 6.0, color::ACCENT);
+        // High-tech neon cyan glow outline
+        ui.rounded(x - 2.0, y - 2.0, w + 4.0, h + 4.0, 10.0, 0x5000E5FF);
+        ui.rounded(x, y, w, h, 8.0, 0xFF0D9488);
+        ui.rounded(x + 2.0, y + 1.0, (w - 4.0).max(1.0), 2.0, 1.0, 0x9000E5FF);
     } else {
-        ui.rounded(x - 1.0, y - 1.0, w + 2.0, h + 2.0, 7.0, with_alpha(color::BORDER, 0.25));
-        ui.rounded(x, y, w, h, 6.0, color::RAISED);
+        // Dark futuristic glass container with subtle cyan-slate outline
+        ui.rounded(x - 1.0, y - 1.0, w + 2.0, h + 2.0, 9.0, 0x2A38BDF8);
+        ui.rounded(x, y, w, h, 8.0, 0xD0101827);
     }
     let padding = (w * 0.12).clamp(4.0, 12.0);
     let base = if w < 80.0 { 13.0 } else { 16.0 };
@@ -225,8 +228,12 @@ impl Launcher {
         }
         let (w, h) = (ui.w, ui.h);
         let scale = ui.density / ui.batch.scale;
+        // Deep obsidian futuristic background
         ui.batch
-            .fill(&gui.atlas, 0.0, 0.0, w * scale, h * scale, color::BG);
+            .fill(&gui.atlas, 0.0, 0.0, w * scale, h * scale, 0xFF090D16);
+        // Futuristic top cyan neon laser beam
+        ui.batch
+            .fill(&gui.atlas, 0.0, 0.0, w * scale, 2.5 * scale, 0xFF00E5FF);
         ui.text(
             Face::Medium,
             if w < 400.0 {
@@ -234,12 +241,12 @@ impl Launcher {
             } else if w < 700.0 {
                 24.0
             } else {
-                32.0
+                30.0
             },
             32.0,
-            if w < 700.0 { 12.0 } else { 28.0 },
-            color::TEXT,
-            &format!("Horizon Android {}", crate::backend::VERSION),
+            if w < 700.0 { 12.0 } else { 26.0 },
+            0xFF00E5FF,
+            &format!("HORIZON // 26.3 VULKAN"),
         );
         button(
             &mut ui,
@@ -422,16 +429,19 @@ impl Launcher {
                 );
             } else {
                 let play_w = if compact { w - 64.0 } else { 320.0 };
+                let play_y = h - 96.0;
+                // Futuristic glowing launch button
+                ui.rounded(30.0, play_y - 2.0, play_w + 4.0, 60.0, 14.0, 0x6000E5FF);
                 button(
                     &mut ui,
                     &mut self.targets,
-                    [32.0, h - 96.0, play_w, 56.0],
+                    [32.0, play_y, play_w, 56.0],
                     if installed {
-                        "▶  Play Game"
+                        "⚡  LAUNCH HORIZON"
                     } else if self.error.is_some() {
-                        "Retry installation"
+                        "🔄  Retry Installation"
                     } else {
-                        "Download Minecraft 26.3"
+                        "⬇  Download Minecraft 26.3"
                     },
                     Action::Play,
                     true,
