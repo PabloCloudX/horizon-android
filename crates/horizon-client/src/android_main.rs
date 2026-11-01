@@ -64,9 +64,9 @@ mod skins;
 // The shared account protocol needs only the launcher's version and data path.
 mod backend {
     pub const VERSION: &str = if crate::PUBLIC_BUILD {
-        "0.7.9-zalith"
+        "0.7.10-sildurs"
     } else {
-        "0.7.9-zalith-dev"
+        "0.7.10-sildurs-dev"
     };
     static HOME: std::sync::OnceLock<std::path::PathBuf> = std::sync::OnceLock::new();
     pub fn initialize(home: std::path::PathBuf) {
@@ -154,6 +154,16 @@ pub(crate) fn android_event_loop() -> Result<EventLoop<()>, winit::error::EventL
 /// Development overrides for testing both of Horizon's single-player paths.
 pub(crate) fn android_arguments() -> horizon_client::Result<Vec<String>> {
     let home = APP.with(|app| app.borrow().as_ref().unwrap().internal_data_path().unwrap());
+    // Ensure native Sildur's Enhanced Default shader pack is bundled in shaderpacks/
+    let shader_dir = home.join("shaderpacks");
+    let sildur_pack = shader_dir.join("sildurs_enhanced.hshader");
+    if !sildur_pack.is_file() {
+        let _ = std::fs::create_dir_all(&shader_dir);
+        let _ = std::fs::write(
+            &sildur_pack,
+            include_bytes!("../../horizon-shader-api/packs/sildurs_enhanced.hshader"),
+        );
+    }
     let config = catalog::Config::load(&home);
     let mut args = vec![
         "--resources".into(),
