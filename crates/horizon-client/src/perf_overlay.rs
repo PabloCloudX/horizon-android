@@ -23,7 +23,33 @@ impl FrameGraph {
         self.frames.push_back((frame_ms, cpu_ms, gpu));
     }
     pub fn draw(&self, mode: Overlay, batch: &mut HudBatch, atlas: &HudAtlas) {
-        if mode == Overlay::Off || self.frames.is_empty() {
+        if self.frames.is_empty() {
+            return;
+        }
+        let n = self.frames.len() as f32;
+        let avg = |f: fn(&(f32, f32, f32)) -> f32| self.frames.iter().map(f).sum::<f32>() / n;
+        let frame = avg(|f| f.0);
+        let fps = (1000.0 / frame.max(0.001)).round() as u32;
+
+        if mode == Overlay::Off {
+            let text = format!("{fps} FPS");
+            let text_w = atlas.font.width(&text);
+            let width = text_w + 14.0;
+            let height = 18.0;
+            let x = batch.width - width - 6.0;
+            let y = 6.0;
+            // Dark futuristic glass pill
+            batch.fill(atlas, x, y, width, height, rgba(10, 15, 26, 180));
+            // Neon cyan top border highlight
+            batch.fill(atlas, x, y, width, 1.5, rgba(0, 229, 255, 230));
+            batch.text_styled(
+                atlas,
+                &Text::literal(text),
+                x + 7.0,
+                y + 4.0,
+                rgba(255, 255, 255, 255),
+                true,
+            );
             return;
         }
         let n = self.frames.len() as f32;
