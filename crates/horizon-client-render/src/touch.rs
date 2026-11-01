@@ -664,25 +664,34 @@ impl TouchControls {
         }
         let aspect = self.aspect();
         if let Some((role, previous)) = self.fingers.get_mut(&id) {
-            let delta = if let Role::Look {
-                start,
-                dragged,
-                since,
-                committed,
-                ..
-            } = role
-            {
-                if !*dragged && since.elapsed() >= HOLD_DELAY {
-                    *committed = true;
+            let delta = match role {
+                Role::Look {
+                    start,
+                    dragged,
+                    since,
+                    committed,
+                    ..
+                } => {
+                    if !*dragged && since.elapsed() >= HOLD_DELAY {
+                        *committed = true;
+                    }
+                    *dragged |= ((point[0] - start[0]) * aspect).hypot(point[1] - start[1]) > 0.018;
+                    if *dragged {
+                        [point[0] - previous[0], point[1] - previous[1]]
+                    } else {
+                        [0.0; 2]
+                    }
                 }
-                *dragged |= ((point[0] - start[0]) * aspect).hypot(point[1] - start[1]) > 0.018;
-                if *dragged {
+                // Zalith/Pojav 2-finger ergonomics:
+                // While holding Attack (RightTrigger, mining) or Use (LeftTrigger, placing),
+                // dragging the thumb rotates the camera seamlessly without requiring a 3rd finger!
+                Role::Button(button) if matches!(button, Button::RightTrigger | Button::LeftTrigger) => {
                     [point[0] - previous[0], point[1] - previous[1]]
-                } else {
-                    [0.0; 2]
                 }
-            } else {
-                [0.0; 2]
+                Role::Ignore if self.custom_fingers.contains_key(&id) => {
+                    [point[0] - previous[0], point[1] - previous[1]]
+                }
+                _ => [0.0; 2],
             };
             *previous = point;
             return delta;
