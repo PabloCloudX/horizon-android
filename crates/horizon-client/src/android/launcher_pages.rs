@@ -254,7 +254,7 @@ impl Launcher {
             brand_x + (if w < 700.0 { 146.0 } else { 190.0 }),
             brand_y + 13.0,
             0xFF64748B,
-            "v0.7.9",
+            "v0.7.10",
         );
         button(
             &mut ui,
@@ -481,7 +481,7 @@ impl Launcher {
                         feat_x + 14.0,
                         feat2_y + 12.0,
                         0xFF38BDF8,
-                        "🌐 ANTI-DISCONNECT DNS",
+                        "✨ SILDUR'S SHADER BUNDLED",
                     );
                     ui.text(
                         Face::Regular,
@@ -489,7 +489,7 @@ impl Launcher {
                         feat_x + 14.0,
                         feat2_y + 32.0,
                         0xFFCBD5E1,
-                        "Automated public DNS resolution for servers.",
+                        "Vulkan WGSL: warm sun, vibrant sky & water.",
                     );
                     if feat_h >= 68.0 {
                         ui.text(
@@ -498,7 +498,7 @@ impl Launcher {
                             feat_x + 14.0,
                             feat2_y + 48.0,
                             0xFF64748B,
-                            "Extended 25s connect & 60s read keepalive.",
+                            "Options > Horizon Settings > Shader Packs.",
                         );
                     }
                 } else {
